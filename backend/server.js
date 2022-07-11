@@ -1,7 +1,12 @@
-//import express, dotenv, errorHandler
+//import express, dotenv, errorHandler, colors, connectDB,
 const express = require('express');
+const colors = require('colors');
 const dotenv = require('dotenv').config();
 const { errorHandler } = require('./middleware/errorMiddleware');
+const connectDB = require('./config/db')
+
+//calling connectDB
+connectDB();
 
 //calling PORT from .env file
 const port = process.env.PORT || 5000;
