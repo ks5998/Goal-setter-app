@@ -1,5 +1,7 @@
 //import asyncHandler, Goal, 
 const asyncHandler = require('express-async-handler');
+
+const USer = require('../model/userModel');
 const Goal = require('../model/goalModel');
 
 //here I am refactoring the C-R-U-D operations
@@ -9,7 +11,9 @@ const Goal = require('../model/goalModel');
 //@access Private
 const getGoals = asyncHandler(
     async (req, res)=>{
-        const goals = await Goal.find();
+        const goals = await Goal.find({
+            user: req.user.id
+        })
         res.status(200).json(goals);
     }
 ) 
@@ -25,6 +29,7 @@ const setGoals = asyncHandler(
         }
         const goal = await Goal.create({
             text: req.body.text,
+            user: req.user.id,
         })
         res.status(200).json(goal);
     }
@@ -39,6 +44,19 @@ const updateGoals = asyncHandler(
         if(!goal){
             res.status(400);
             throw new Error('Goal not found');
+        }
+        const user = await User.findById(req.user.id);
+
+        //check if user exists
+        if(!user){
+            res.status(401);
+            throw new Error('User not found');
+        }
+
+        //make sure the logged in user matches the goal user
+        if(goal.user.toString() !== user.id){
+            res.status(401);
+            throw new Error('User does not matches');
         }
         const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -57,6 +75,19 @@ const deleteGoals = asyncHandler(
             res.status(400);
             throw new Error('Goal not found');
         }
+        const user = await User.findById(req.user.id);
+
+        //check if user exists
+        if(!user){
+            res.status(401);
+            throw new Error('User not found');
+        }
+
+        //make sure the logged in user matches the goal user
+        if(goal.user.toString() !== user.id){
+            res.status(401);
+            throw new Error('User does not matches');
+        } 
         await goal.remove();
         res.status(200).json({ id: req.params.id });
     }

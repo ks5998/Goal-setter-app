@@ -7,9 +7,11 @@ const {
 
 const router = express.Router();
 
+const { protect } = require('../middleware/authMiddleware');
+
 //setting up the route of C-R-U-D operation
-router.route('/').get(getGoals).post(setGoals);
-router.route('/:id').put(updateGoals).delete(deleteGoals);
+router.route('/').get(protect, getGoals).post(protect, setGoals);
+router.route('/:id').put(protect, updateGoals).delete(protect, deleteGoals);
 
 //another way of setting the route of CRUD operations
 /* router.get('/', getGoals);
